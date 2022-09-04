@@ -1,0 +1,319 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+```{r}
+library(ggplot2)
+library(dplyr)
+library(reshape) 
+library(gridExtra) 
+```
+
+```{r}
+df_combined <- read.csv(file = "/Users/niharawarawita/Desktop/MSc Project/Data and code/complete_dataset_15subwindows_10slices.csv")
+
+#df1 <- read.csv(file = "/Users/niharawarawita/Desktop/MSc Project/Data/Lili_Experiment/combined_stats_lili_nihara_version.csv")
+
+#df2 <- read.csv(file = "/Users/niharawarawita/Desktop/MSc Project/Data/EMG_data_collection/combined_stats_nihara.csv")
+
+```
+
+```{r}
+#str(df_combined)
+df_combined$property_name <- factor(df_combined$property_name, levels=c('smoothness', 'thickness', 'warmth', 'flexibility', 'softness', 'enjoyment'))
+df_combined$rating_level <- factor(df_combined$rating_level, levels=c('low', 'medium', 'high'))
+df_combined$rating <- factor(df_combined$rating, levels=c(1,2,3,4,5,6,7))
+#str(df_combined)
+```
+
+## Ratings 1
+```{r}
+plot1a <- ggplot(df_combined, aes(x = property_name, fill = rating)) +
+  geom_bar()  + 
+  labs(title='Distribution of the original rating variable across properties ', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+    scale_fill_manual(values=c("#F8766D","goldenrod2","#7CAE00","#00BE67","#00BFC4","#00A9FF","#C77CFF"))+ ##CD9600"
+  guides(fill = guide_legend(title = "Rating"))+
+  geom_text(aes(label = ..count..), stat = "count", position = position_stack(vjust = 0.5))
+plot1a
+
+
+plot2a <- ggplot(df_combined, aes(x = property_name, fill = rating_level)) +
+  geom_bar()  + 
+  labs(title='Distribution of the newly grouped rating variable across properties ', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating Level")) +
+  scale_fill_discrete(labels = c("Low", "Medium", "High"))+
+  scale_fill_manual(values=c("goldenrod2","#53B400","#00B9E3"))+ #C49A00, 00BFC4, 00BFC4
+  geom_text(aes(label = ..count..), stat = "count", position = position_stack(vjust = 0.5))
+plot2a
+
+```
+
+```{r Fig1, echo=TRUE, fig.height=9, fig.width=10}
+grid.arrange(plot1a, plot2a, nrow=2)
+```
+```{r}
+library(scales)
+
+#set margins of plot area
+par(mai = c(0.1, 0, 0.1, 0), bg = "grey85")
+num = 12
+#create plot with ggplot2 default colors from 1 to 8
+gc.grid <- layout(matrix(1:num, nrow = num))
+for(i in 1:num){
+   gc.ramp <- hue_pal()(i)
+   plot(c(0, num), c(0,1),
+        type = "n", 
+        bty="n", 
+        xaxt="n", 
+        yaxt="n", xlab="", ylab="")
+   for(j in 1:i){
+      rect(j - 1, 0, j - 0.25, 1, col = gc.ramp[j])
+   }
+}
+
+for(i in 1:num){
+  print(hue_pal()(i))
+}
+```
+
+
+```{r}
+
+plot1b <- ggplot(df_combined, aes(x = property_name, fill = rating)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property (combined data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating"))+
+  geom_text(aes(label = scales::percent(..count../tapply(..count.., ..x.. ,sum)[..x..])),
+            position = position_stack(vjust = 0.5),stat = "count")
+plot1b
+
+
+
+plot2b <- ggplot(df_combined, aes(x = property_name, fill = rating_level)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property (combined data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating Level")) +
+  scale_fill_discrete(labels = c("Low", "Medium", "High"))+
+  geom_text(aes(label = scales::percent(..count../tapply(..count.., ..x.. ,sum)[..x..])),
+            position = position_stack(vjust = 0.5),stat = "count") 
+plot2b
+
+
+
+
+# Get values?
+```
+```{r}
+cgvhkbjl
+```
+
+## Ratings 2
+```{r}
+
+plot1b <- ggplot(df1, aes(x = property_name, fill = rating_level)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property (Lili data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating Level")) +
+  scale_fill_discrete(labels = c("Low", "Medium", "High"))+
+  geom_text(aes(label = ..count..), stat = "count", position = position_stack(vjust = 0.5))
+plot1b
+
+plot1c <- ggplot(df2, aes(x = property_name, fill = rating_level)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property (2022 data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating Level")) +
+  scale_fill_discrete(labels = c("Low", "Medium", "High"))+
+  geom_text(aes(label = ..count..), stat = "count", position = position_stack(vjust = 0.5))
+plot1c
+plot1a <- ggplot(df_combined, aes(x = property_name, fill = rating_level)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property (combined data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating Level")) +
+  scale_fill_discrete(labels = c("Low", "Medium", "High"))+
+  geom_text(aes(label = scales::percent(..count../tapply(..count.., ..x.. ,sum)[..x..])),
+            position = position_stack(vjust = 0.5),stat = "count") 
+plot1a
+
+plot1b <- ggplot(df1, aes(x = property_name, fill = rating_level)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property (Lili data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating Level")) +
+  scale_fill_discrete(labels = c("Low", "Medium", "High"))+
+  geom_text(aes(label = scales::percent(..count../tapply(..count.., ..x.. ,sum)[..x..])),
+            position = position_stack(vjust = 0.5),stat = "count")
+plot1b
+
+plot1c <- ggplot(df2, aes(x = property_name, fill = rating_level)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property (2022 data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating Level")) +
+  scale_fill_discrete(labels = c("Low", "Medium", "High"))+
+  geom_text(aes(label = scales::percent(..count../tapply(..count.., ..x.. ,sum)[..x..])),
+            position = position_stack(vjust = 0.5),stat = "count")
+plot1c
+
+# Get values?
+```
+
+
+
+```{r}
+plot2b <- ggplot(df_combined, aes(x = property_name, fill = rating)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property (Lili data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating")) +
+  geom_text(aes(label = ..count..), stat = "count", position = position_stack(vjust = 0.5))
+plot2b
+
+plot2c <- ggplot(df_combined, aes(x = property_name, fill = rating)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property  (2022 data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating")) +
+  geom_text(aes(label = ..count..), stat = "count", position = position_stack(vjust = 0.5))
+plot2c
+
+
+plot2b <- ggplot(df_combined, aes(x = property_name, fill = rating)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property (Lili data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating")) +
+  geom_text(aes(label = scales::percent(..count../tapply(..count.., ..x.. ,sum)[..x..])),
+            position = position_stack(vjust = 0.5),stat = "count")
+plot2b
+
+plot2c <- ggplot(df_combined, aes(x = property_name, fill = rating)) +
+  geom_bar()  + 
+  labs(title='Distribution of rating for each property  (2022 data)', x='Property', y='Number of occurences')+
+  theme(plot.title=element_text(hjust=0.5))+
+  guides(fill = guide_legend(title = "Rating")) +
+  geom_text(aes(label = scales::percent(..count../tapply(..count.., ..x.. ,sum)[..x..])),
+            position = position_stack(vjust = 0.5),stat = "count")
+plot2c
+
+```
+
+
+```{r}
+#head(df_combined)
+df_combined[c()]
+#round(cor(df_combined[c(12:60)], use = 'complete.obs'),4)
+```
+
+
+
+```{r}
+# Corr mat for emg
+
+corr_mat_emg <- round(cor(df_combined[c(12:59)], use = 'complete.obs'),4)
+
+ 
+
+melted_corr_mat_emg <- melt(corr_mat_emg)
+
+ggplot(data = melted_corr_mat_emg, aes(X2, X1, fill = value))+ #
+  geom_tile(color = "Black")+
+  scale_fill_gradient2(low = "blue", high = "Red", mid = "White",
+                       midpoint = 0, limit = c(-1,1), space = "Lab",
+                       name="Pearson\nCorrelation") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0,
+                                   size = 8, hjust = 1))+
+
+coord_fixed()
+
+
+```
+
+
+```{r}
+# Corr mat for qua
+
+corr_mat_qua <- round(cor(df_combined[c(60:113)], use = 'complete.obs'),4)
+
+melted_corr_mat_qua <- melt(corr_mat_qua)
+
+ggplot(data = melted_corr_mat_qua, aes(X2, X1, fill = value))+ #
+  geom_tile(color = "Black")+
+  scale_fill_gradient2(low = "blue", high = "Red", mid = "White",
+                       midpoint = 0, limit = c(-1,1), space = "Lab",
+                       name="Pearson\nCorrelation") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0,
+                                   size = 8, hjust = 1))+
+
+coord_fixed()
+
+```
+
+```{r}
+# Corr mat for acc
+
+corr_mat_acc <- round(cor(df_combined[c(114:191)], use = 'complete.obs'),4)
+
+melted_corr_mat_acc <- melt(corr_mat_acc)
+
+ggplot(data = melted_corr_mat_acc, aes(X2, X1, fill = value))+ #
+  geom_tile(color = "Black")+
+  scale_fill_gradient2(low = "blue", high = "Red", mid = "White",
+                       midpoint = 0, limit = c(-1,1), space = "Lab",
+                       name="Pearson\nCorrelation") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0,
+                                   size = 8, hjust = 1))+
+
+coord_fixed()
+
+```
+
+
+```{r}
+smooth_df1 = df1[df1$property_id==3,]
+thick_df1 = df1[df1$property_id==4,]
+warm_df1 = df1[df1$property_id==5,]
+flex_df1 = df1[df1$property_id==6,]
+soft_df1 = df1[df1$property_id==7,]
+enjoy_df1 = df1[df1$property_id==8,]
+
+smooth_df1 = df1[df1$property_id==3,]
+thick_df1 = df1[df1$property_id==4,]
+warm_df1 = df1[df1$property_id==5,]
+flex_df1 = df1[df1$property_id==6,]
+soft_df1 = df1[df1$property_id==7,]
+enjoy_df1 = df1[df1$property_id==8,]
+
+#da
+df1[df1$property_id==4,]
+```
+
+
+```{r}
+
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
